@@ -1,3 +1,5 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  
+  get 'v1/api_check' => 'application#v1_api_check' #For clients to verify api access
+  
 end
