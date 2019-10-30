@@ -13,14 +13,34 @@ class ApplicationController < ActionController::API
           end
         else
             render json: {:result => 'failure', :message => 'You are missing valid credentials in your request header', :payload => {}, :status => 200}
-        end  
+        end
     
     end
     
     def v1_sign_up_stub
       
-      #return happy path vars for now.
-      render json: {:result => 'success', :message => 'You connected successfully', :payload => {}, :status => 200}  
+      #check for the API key.
+      if request.headers["X-Api-Access-Key"].present? && request.headers["X-Api-Access-Secret"]          
+        api_key_check = JSON.parse(api_key_is_valid(request.headers["X-Api-Access-Key"],request.headers["X-Api-Access-Secret"]))          
+        if api_key_check["result"] == "success"            
+          
+          #provide email to user.
+          @recipient_name = ""
+          @recipient_email = params[:email]
+          @subject = "Thanks for reaching out on denisdaigle.com!"
+          @body = "Hello, thanks for visiting my website and reaching out. How can I help with your WebApp or SaaS project?"
+          GeneralMailer.general_email(@recipient_name, @recipient_email, @subject, @body).deliver
+
+          #return happy path vars for now.
+          render json: {:result => 'success', :message => 'You connected successfully', :payload => {}, :status => 200}  
+             
+        else
+          render json: {:result => 'failure', :message => api_key_check["message"], :payload => {}, :status => 200}
+        end
+      else
+          #oops.
+          render json: {:result => 'failure', :message => 'You are missing valid credentials in your request header', :payload => {}, :status => 200}
+      end
       
     end
     
