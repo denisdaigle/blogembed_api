@@ -17,6 +17,13 @@ class ApplicationController < ActionController::API
     
     end
     
+    def v1_sign_up_stub
+      
+      #return happy path vars for now.
+      render json: {:result => 'success', :message => 'You connected successfully', :payload => {}, :status => 200}  
+      
+    end
+    
     protected
     
     #API Gateway
