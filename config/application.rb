@@ -33,5 +33,8 @@ module Environment
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+    
+    config.access_point = config_for(:access_points) #in order to get various connection points.
+    
   end
 end
