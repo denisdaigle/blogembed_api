@@ -6,4 +6,6 @@ Rails.application.routes.draw do
   
   get '/v1/validate_sign_up_code' => 'users#v1_validate_sign_up_code'
   
+  post '/v1/save_profile_setup' => "users#v1_save_profile_setup"
+  
 end
