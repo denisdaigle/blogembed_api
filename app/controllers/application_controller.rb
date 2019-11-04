@@ -17,8 +17,6 @@ class ApplicationController < ActionController::API
     
     end
     
-    
-    
     protected
     
     #API Gateway
