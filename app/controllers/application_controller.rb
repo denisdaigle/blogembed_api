@@ -1,5 +1,23 @@
 class ApplicationController < ActionController::API
     
+    before_action :validate_api_access
+    
+    def validate_api_access
+      
+      #check for the API key.
+      if request.headers["X-Api-Access-Key"].present? && request.headers["X-Api-Access-Secret"]          
+        api_key_check = JSON.parse(api_key_is_valid(request.headers["X-Api-Access-Key"],request.headers["X-Api-Access-Secret"]))          
+        if api_key_check["result"] == "success"
+          #allow access
+        else
+          render json: {:result => 'failure', :message => api_key_check["message"], :payload => {}, :status => 200}
+        end
+      else
+          render json: {:result => 'failure', :message => 'You are missing valid credentials in your request header', :payload => {}, :status => 200}
+      end 
+      
+    end
+    
     #API Gateway call
     def v1_api_check #/v1/api_check
             
