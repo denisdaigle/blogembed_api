@@ -102,7 +102,7 @@ class UsersController < ApplicationController
             
         else
             
-            render json: {:result => 'failure', :message => "Sorry, we couldn\'t find you using the provided UID.", :payload => {}, :status => 200}
+            render json: {:result => 'failure', :message => "Sorry, we could not find you using the provided UID.", :payload => {}, :status => 200}
             
         end    
         
@@ -150,7 +150,7 @@ class UsersController < ApplicationController
         
       else
         
-        render json: {:result => 'failure', :message => 'Sorry, we could not find you with using this email address', :payload => {}, :status => 200}
+        render json: {:result => 'failure', :message => 'Sorry, we could not find you using this email address', :payload => {}, :status => 200}
      
       end 
       

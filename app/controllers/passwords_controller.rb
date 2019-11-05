@@ -43,7 +43,7 @@ class PasswordsController < ApplicationController
         
       @password_provided = params[:password]
       @password_reset_code = params[:password_reset_code]
-      
+
       @existing_user = User.where(:password_reset_code => @password_reset_code).first
       
       if @existing_user.present?
@@ -57,7 +57,7 @@ class PasswordsController < ApplicationController
         end
         
         #prevent additional password changes with current code.
-        #@existing_user.password_reset_code = nil
+        @existing_user.password_reset_code = nil
         
         #save our changes.
         @existing_user.save  
