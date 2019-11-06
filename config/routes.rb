@@ -17,4 +17,7 @@ Rails.application.routes.draw do
   post '/v1/process_request_reset_password_link' => "passwords#v1_process_request_reset_password_link"
   post '/v1/process_new_password'  => "passwords#v1_process_new_password"
   
+  #blogs
+  post '/v1/save_blog_and_post_content' => "blogs#v1_save_blog_and_post_content"
+  
 end
