@@ -19,5 +19,8 @@ Rails.application.routes.draw do
   
   #blogs
   post '/v1/save_blog_and_post_content' => "blogs#v1_save_blog_and_post_content"
+  get '/v1/fetch_blogs_from_database' => "blogs#v1_fetch_blogs_from_database"
+  get '/v1/fetch_post_from_database' => "blogs#v1_fetch_post_from_database"
+  post '/v1/save_post_changes' => "blogs#v1_save_post_changes"
   
 end
