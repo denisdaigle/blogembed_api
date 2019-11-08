@@ -24,5 +24,8 @@ Rails.application.routes.draw do
   post '/v1/save_post_changes' => "blogs#v1_save_post_changes"
   get '/v1/delete_post' => "blogs#v1_delete_post"
   get '/v1/delete_blog' => "blogs#v1_delete_blog"
+  post '/v1/create_post' => "blogs#v1_create_post"
+  get '/v1/fetch_blog_details_from_database' => 'blogs#v1_fetch_blog_details_from_database'
+  post '/v1/save_blog_details_changes' => 'blogs#v1_save_blog_details_changes'
   
 end
