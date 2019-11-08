@@ -22,5 +22,7 @@ Rails.application.routes.draw do
   get '/v1/fetch_blogs_from_database' => "blogs#v1_fetch_blogs_from_database"
   get '/v1/fetch_post_from_database' => "blogs#v1_fetch_post_from_database"
   post '/v1/save_post_changes' => "blogs#v1_save_post_changes"
+  get '/v1/delete_post' => "blogs#v1_delete_post"
+  get '/v1/delete_blog' => "blogs#v1_delete_blog"
   
 end

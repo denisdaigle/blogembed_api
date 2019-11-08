@@ -150,4 +150,74 @@ class BlogsController < ApplicationController
         
     end 
     
+    def v1_delete_post
+      
+      if params[:post_uid].present? && params[:db_session_token].present?
+        
+        @user = User.where(:db_session_token => params[:db_session_token]).first
+        
+        if @user.present?
+
+          #Let's get the post they requested to view.
+          @post = @user.posts.where(:uid => params[:post_uid]).first
+          
+          if @post.present?
+            
+            #save post changes.
+            @post.destroy
+            
+            render json: {:result => 'success', :message => "Your post was deleted successfully", :payload => {}, :status => 200}
+          else  
+            render json: {:result => 'failure', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
+          end
+
+        else
+          
+          render json: {:result => 'failure', :message => 'Sorry, we could not find your user account', :payload => {}, :status => 200}
+        
+        end  
+         
+      else
+        
+        render json: {:result => 'failure', :message => 'Looks like you are missing some details', :payload => {}, :status => 200}
+        
+      end 
+      
+    end
+    
+    def v1_delete_blog
+      
+      if params[:blog_uid].present? && params[:db_session_token].present?
+        
+        @user = User.where(:db_session_token => params[:db_session_token]).first
+        
+        if @user.present?
+
+          #Let's get the post they requested to view.
+          @blog = @user.blogs.where(:uid => params[:blog_uid]).first
+          
+          if @blog.present?
+            
+            #save post changes.
+            @blog.destroy
+            
+            render json: {:result => 'success', :message => "Your blog and all its posts were deleted successfully", :payload => {}, :status => 200}
+          else  
+            render json: {:result => 'failure', :message => 'Sorry, we could not find this blog in our database.', :payload => {}, :status => 200}
+          end
+
+        else
+          
+          render json: {:result => 'failure', :message => 'Sorry, we could not find your user account', :payload => {}, :status => 200}
+        
+        end  
+         
+      else
+        
+        render json: {:result => 'failure', :message => 'Looks like you are missing some details', :payload => {}, :status => 200}
+        
+      end 
+      
+    end
+    
 end
