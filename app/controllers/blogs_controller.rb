@@ -55,7 +55,7 @@ class BlogsController < ApplicationController
             
             #let's get all the posts.
             blog_posts = []
-            blog.posts.each do |post|
+            blog.posts.order('created_at DESC').each do |post|
               this_post = {}
               this_post["post_title"] = post.title
               this_post["post_uid"] = post.uid
@@ -346,7 +346,7 @@ class BlogsController < ApplicationController
           if @post.present?
             
             #save post changes.
-            @post.update!(:status => "live")
+            @post.update!(:status => "live", :last_published => DateTime.now)
             
             render json: {:result => 'success', :message => "Your post was published successfully.", :payload => {:post => @post.get_post_details}, :status => 200}
           else  
@@ -381,7 +381,7 @@ class BlogsController < ApplicationController
           if @post.present?
             
             #save post changes.
-            @post.update!(:status => "draft")
+            @post.update!(:status => "draft", :last_published => nil)
             
             render json: {:result => 'success', :message => "This post was successfully unpublished", :payload => {:post => @post.get_post_details}, :status => 200}
           else  
