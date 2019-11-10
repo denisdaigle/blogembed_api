@@ -29,5 +29,7 @@ Rails.application.routes.draw do
   post '/v1/save_blog_details_changes' => 'blogs#v1_save_blog_details_changes'
   get '/v1/publish_post' => 'blogs#v1_publish_post'
   get '/v1/unpublish_post' => 'blogs#v1_unpublish_post'
+  get '/v1/fetch_post_for_embed' => 'blogs#v1_fetch_post_for_embed'
+  post '/v1/add_permitted_domain' => 'blogs#v1_add_permitted_domain'
   
 end

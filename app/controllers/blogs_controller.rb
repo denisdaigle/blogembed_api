@@ -86,7 +86,7 @@ class BlogsController < ApplicationController
     end  
     
     def v1_fetch_post_from_database
-      
+ 
       if params[:db_session_token].present? && params[:post_uid].present?
         
         @user = User.where(:db_session_token => params[:db_session_token]).first
@@ -148,7 +148,7 @@ class BlogsController < ApplicationController
     end  
     
     def v1_save_post_changes
-       
+     
       if params[:post_title].present? && params[:post_content].present? && params[:post_uid].present? && params[:db_session_token].present?
         
         @user = User.where(:db_session_token => params[:db_session_token]).first
@@ -401,5 +401,84 @@ class BlogsController < ApplicationController
       end 
         
     end
+    
+    def v1_fetch_post_for_embed
+      
+      if params[:post_uid].present? && params[:requesting_url].present?
+        
+        #Let's get the post they requested to view.
+        @post = Post.where(:uid => params[:post_uid]).first
+        
+        if @post.present?
+          
+          #first, let's see what blog this post belongs to.
+          @blog = @post.blog
+          
+          #is the requesting url allowed to access this blog post?
+          domain_permitted = false
+          @blog.permitted_domains.each do |domain|
+            if params[:requesting_url] == domain
+              domain_permitted = true
+              break
+            end  
+          end  
+          
+          if domain_permitted
+            render json: {:result => 'success', :message => "Access permitted.", :payload => {:post => @post.content}, :status => 200}
+          else
+            render json: {:result => 'failure', :message => "To view this content here, please add #{params[:requesting_url]} to your permitted domains on", :payload => {}, :status => 200}
+          end  
+
+        else  
+          
+          render json: {:result => 'failure', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
+       
+        end  
+         
+      else
+        
+        render json: {:result => 'failure', :message => 'Looks like you are missing your session token.', :payload => {}, :status => 200}
+        
+      end
+      
+    end  
+    
+    def v1_add_permitted_domain
+      
+      if params[:db_session_token].present? && params[:blog_uid].present? && params[:permitted_domain].present?
+        
+        @user = User.where(:db_session_token => params[:db_session_token]).first
+        
+        if @user.present?
+          
+          #Let's get the post they requested to view.
+          @blog = @user.blogs.where(:uid => params[:blog_uid]).first
+          
+          if @blog.present?
+            
+            #Check to see if it still exists.
+            @permitted_domain = PermittedDomain.create!(:permitted_domain => params[:permitted_domain], :blog_id => @blog_id)
+            
+            render json: {:result => 'success', :message => "Here is your post information.", :payload => {:blog_details => {:blog_name => @blog.name, :blog_uid => @blog.uid}}, :status => 200}
+          
+          else 
+            
+            render json: {:result => 'failure', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
+          
+          end
+
+        else
+          
+          render json: {:result => 'failure', :message => 'Sorry, we could not find your user account.', :payload => {}, :status => 200}
+        
+        end  
+         
+      else
+        
+        render json: {:result => 'failure', :message => 'Looks like you are missing your session token.', :payload => {}, :status => 200}
+        
+      end
+      
+    end  
     
 end
