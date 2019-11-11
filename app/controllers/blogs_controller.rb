@@ -344,12 +344,29 @@ class BlogsController < ApplicationController
           
           if @post.present?
             
-            #save post changes.
-            @post.update!(:status => "live", :last_published => DateTime.now)
+            #Let's see if this user is allowed to publish this post.
+            if @user.publish_counts.count >= 3 && @user.account_type == "trial" 
             
-            render json: {:result => 'success', :message => "Your post was published successfully.", :payload => {:post => @post.get_post_details}, :status => 200}
+              render json: {:result => 'failure', :reason => "trial_paywall", :message => "Free trial publish limit reached. You can publish this content once you", :payload => {}, :status => 200}
+            
+            else
+            
+              #save post changes.
+              @post.update!(:status => "live", :last_published => DateTime.now)
+              
+              #increase the publish count if this post has not yet been added.
+              unless @user.publish_counts.where(:post_id => @post.id).present?
+                PublishCount.create!(:user_id => @user.id, :post_id => @post.id)
+              end 
+            
+              render json: {:result => 'success', :message => "Your post was published successfully.", :payload => {:post => @post.get_post_details}, :status => 200}
+
+            end
+            
           else  
+            
             render json: {:result => 'failure', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
+          
           end
 
         else
