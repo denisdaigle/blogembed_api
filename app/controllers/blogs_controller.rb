@@ -454,7 +454,7 @@ class BlogsController < ApplicationController
 
         else  
           
-          render json: {:result => 'failure', :reason => 'not_found', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
+          render json: {:result => 'failure', :reason => 'not_found', :message => 'This post is no longer available.', :payload => {}, :status => 200}
        
         end  
          
