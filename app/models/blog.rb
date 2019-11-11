@@ -8,8 +8,8 @@ class Blog < ApplicationRecord
         
         @blog_permitted_domains = []
         self.permitted_domains.each do |domain|
-          @blog_permitted_domains << domain.permitted_domain
-        end  
+          @blog_permitted_domains << [domain.permitted_domain, domain.uid, domain.user_id]
+        end
             
         return {:blog_name => self.name, :blog_uid => self.uid, :blog_permitted_domains => @blog_permitted_domains}
     end    

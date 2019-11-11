@@ -32,5 +32,6 @@ Rails.application.routes.draw do
   get '/v1/fetch_post_for_embed' => 'blogs#v1_fetch_post_for_embed'
   post '/v1/add_permitted_domain' => 'blogs#v1_add_permitted_domain'
   get '/v1/fetch_blog_details' => 'blogs#v1_fetch_blog_details'
+  get '/v1/remove_permitted_domain' => 'blogs#v1_remove_permitted_domain'
   
 end
