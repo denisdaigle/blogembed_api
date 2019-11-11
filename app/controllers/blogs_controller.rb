@@ -49,9 +49,8 @@ class BlogsController < ApplicationController
           @blogs = []
           @user.blogs.order('created_at DESC').each do |blog|
             
-            this_blog = {}
-            this_blog["blog_name"] = blog.name
-            this_blog["blog_uid"] = blog.uid
+            this_blog = blog.blog_details
+            
             
             #let's get all the posts.
             blog_posts = []
@@ -310,7 +309,7 @@ class BlogsController < ApplicationController
             
             @blog.update!(:name => params[:blog_name])
             
-            render json: {:result => 'success', :message => "Here is your post information.", :payload => {:blog_details => {:blog_name => @blog.name, :blog_uid => @blog.uid}}, :status => 200}
+            render json: {:result => 'success', :message => "Here is your post information.", :payload => {:blog_details => @blog.blog_details}, :status => 200}
           
           else 
             
@@ -417,7 +416,7 @@ class BlogsController < ApplicationController
           #is the requesting url allowed to access this blog post?
           domain_permitted = false
           @blog.permitted_domains.each do |domain|
-            if params[:requesting_url] == domain
+            if params[:requesting_url] == domain.permitted_domain
               domain_permitted = true
               break
             end  
@@ -457,9 +456,47 @@ class BlogsController < ApplicationController
           if @blog.present?
             
             #Check to see if it still exists.
-            @permitted_domain = PermittedDomain.create!(:permitted_domain => params[:permitted_domain], :blog_id => @blog_id)
+            @permitted_domain =  @blog.permitted_domains.where(:permitted_domain => params[:permitted_domain]).first
+            unless @permitted_domain.present?
+              @permitted_domain = PermittedDomain.create!(:permitted_domain => params[:permitted_domain], :blog_id => @blog.id)
+            end
             
-            render json: {:result => 'success', :message => "Here is your post information.", :payload => {:blog_details => {:blog_name => @blog.name, :blog_uid => @blog.uid}}, :status => 200}
+            render json: {:result => 'success', :message => "Here is your post information.", :payload => {:blog_details => @blog.blog_details }, :status => 200}
+          
+          else 
+            
+            render json: {:result => 'failure', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
+          
+          end
+
+        else
+          
+          render json: {:result => 'failure', :message => 'Sorry, we could not find your user account.', :payload => {}, :status => 200}
+        
+        end  
+         
+      else
+        
+        render json: {:result => 'failure', :message => 'Looks like you are missing your session token.', :payload => {}, :status => 200}
+        
+      end
+      
+    end  
+    
+    def v1_fetch_blog_details
+      
+      if params[:db_session_token].present? && params[:blog_uid].present?
+        
+        @user = User.where(:db_session_token => params[:db_session_token]).first
+        
+        if @user.present?
+          
+          #Let's get the post they requested to view.
+          @blog = @user.blogs.where(:uid => params[:blog_uid]).first
+          
+          if @blog.present?
+
+            render json: {:result => 'success', :message => "Here is your post information.", :payload => {:blog_details => @blog.blog_details}, :status => 200}
           
           else 
             
