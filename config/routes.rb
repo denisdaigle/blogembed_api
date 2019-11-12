@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   get '/v1/validate_sign_up_code' => 'users#v1_validate_sign_up_code'
   post '/v1/save_profile_setup' => "users#v1_save_profile_setup"
   get '/v1/check_account_type' => "users#v1_check_account_type"
+  post '/v1/send_for_help' => "users#v1_send_for_help" 
+  get '/v1/process_upgrade' => "users#v1_process_upgrade"
   
   #sessions
   get '/v1/nil_db_session_token' => "users#v1_nil_db_session_token"
@@ -34,8 +36,6 @@ Rails.application.routes.draw do
   post '/v1/add_permitted_domain' => 'blogs#v1_add_permitted_domain'
   get '/v1/fetch_blog_details' => 'blogs#v1_fetch_blog_details'
   get '/v1/remove_permitted_domain' => 'blogs#v1_remove_permitted_domain'
-  
-  #upgrade
-  
+
   
 end

@@ -206,7 +206,7 @@ class UsersController < ApplicationController
       
     end  
     
-    def process_upgrade
+    def v1_process_upgrade
 
       if params[:db_session_token].present?
         
@@ -230,6 +230,52 @@ class UsersController < ApplicationController
         
       end
       
+    end  
+    
+    def v1_send_for_help
+      
+      #create a user account. (no error checking yet: valid email, already existing user)
+      @email_provided = params[:email].downcase
+      @question = params[:question]
+      @question_type = params[:question_type]
+      @question_type_label = ""
+      
+      case @question_type
+      when "login"
+        @question_type_label = "I can't access my account"
+      when "signup"
+        @question_type_label = "I have a question before I sign up"
+      when "request"
+        @question_type_label = "I want to request a feature"
+      when "billing"
+        @question_type_label = "I have a billing question"
+      when "email"
+        @question_type_label = "I'm not receiving emails"
+      when "confused"
+        @question_type_label = "I'm confused about how something works"
+      when "broken"
+        @question_type_label = "I think something is broken"
+      else
+         @question_type_label = "other"
+      end  
+
+      #provide email to user.
+      @recipient_name = ""
+      @recipient_email = @email_provided
+      @subject = "Thanks for your question on BlogEmbed.com!"
+      @body = "Hello, <br><br>This is an automated email for your records about the question you just asked us on the BlogEmbed.com Help page:<br><br>Question type: #{@question_type_label}<br><br>Question: #{@question}<br><br>Email: #{@email_provided}<br><br>You can expect an answer shortly. We are on duty Monday to Friday between 8am and 6:30pm Atlantic Time.<br><br>Thanks and have a great day!"
+      GeneralMailer.help_email(@recipient_name, @recipient_email, @subject, @body).deliver
+
+      #Send email to support staff.
+      @recipient_name = "Support Centre"
+      @recipient_email = "help@blogembed.com"
+      @subject = "New BlogEmbed.com Help Question"
+      @body = "BlogEmbed.com Help Question:<br><br>Question type: #{@question_type_label}<br><br>Question: #{@question}<br><br>Email: #{@email_provided}.<br><br>They are waiting to hear from us, let's make their day!"
+      GeneralMailer.help_email(@recipient_name, @recipient_email, @subject, @body).deliver
+
+      #return happy path vars for now.
+      render json: {:result => 'success', :message => 'Alright, message sent.', :payload => {}, :status => 200}  
+
     end  
 
 end
