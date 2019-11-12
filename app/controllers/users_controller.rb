@@ -255,6 +255,8 @@ class UsersController < ApplicationController
         @question_type_label = "I'm confused about how something works"
       when "broken"
         @question_type_label = "I think something is broken"
+      when "cancel"
+        @question_type_label = "I wish to cancel my subscription"  
       else
          @question_type_label = "other"
       end  
