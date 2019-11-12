@@ -126,7 +126,7 @@ class UsersController < ApplicationController
       
     end  
     
-    def process_login
+    def v1_process_login
       
       @user = User.where(:email => params[:email]).first
       if @user.present?
@@ -160,9 +160,11 @@ class UsersController < ApplicationController
       
       if params[:db_session_token].present?
         
-        if User.find_by_db_session_token(params[:db_session_token]).present?
+        @user = User.find_by_db_session_token(params[:db_session_token])
+        
+        if @user.present?
           
-          render json: {:result => 'success', :message => 'Success! db_session_token found.', :payload => {}, :status => 200}
+          render json: {:result => 'success', :message => 'Success! db_session_token found.', :payload => {:account_type => @user.account_type}, :status => 200}
           
         else
           
@@ -175,6 +177,58 @@ class UsersController < ApplicationController
         render json: {:result => 'failure', :message => 'db_session_token is missing', :payload => {}, :status => 200}
         
       end  
+      
+    end  
+    
+    def v1_check_account_type
+      
+      if params[:db_session_token].present?
+        
+        @user = User.find_by_db_session_token(params[:db_session_token])
+        
+        if @user.present?
+          
+          @account_type = @user.account_type
+          
+          render json: {:result => 'success', :message => 'Providing account type', :payload => {:account_type => @account_type}, :status => 200}
+          
+        else
+          
+          render json: {:result => 'failure', :message => 'Seems we could not find you in our database?', :payload => {}, :status => 200}
+          
+        end  
+        
+      else
+        
+        render json: {:result => 'failure', :message => 'Seems you are missing db_session_token is missing', :payload => {}, :status => 200}
+        
+      end 
+      
+    end  
+    
+    def process_upgrade
+
+      if params[:db_session_token].present?
+        
+        @user = User.find_by_db_session_token(params[:db_session_token])
+        
+        if @user.present?
+          
+          @user.update!(:account_type => "hero")
+          
+          render json: {:result => 'success', :message => 'Upgrade successful. Providing new account type', :payload => {:account_type => @user.account_type}, :status => 200}
+          
+        else
+          
+          render json: {:result => 'failure', :message => 'Hmm. Seems we could not find you in our database?', :payload => {}, :status => 200}
+          
+        end  
+        
+      else
+        
+        render json: {:result => 'failure', :message => 'Uh-oh, seems you are missing db_session_token is missing', :payload => {}, :status => 200}
+        
+      end
       
     end  
 
