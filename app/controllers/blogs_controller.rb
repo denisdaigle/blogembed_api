@@ -1,7 +1,61 @@
 class BlogsController < ApplicationController
     
-    def v1_save_blog_and_post_content
+    def v1_fetch_post_for_embed
+      
+      if params[:post_uid].present? && params[:requesting_url].present?
+        
+        #Let's get the post they requested to view.
+        @post = Post.where(:uid => params[:post_uid]).first
+        
+        if @post.present?
+          
+          #first, let's see what blog this post belongs to.
+          @blog = @post.blog
+          
+          #is the requesting url allowed to access this blog post?
+          domain_permitted = false
+          @blog.permitted_domains.each do |domain|
+            
+            #Let's remopve the extra stuff people paste into the domain field, to leave the pure domain.
+            @permitted_domain = domain.permitted_domain.gsub("https://", "").gsub("http://", "").gsub!("/", "")
+            @requesting_url = params[:requesting_url]
+
+            if @requesting_url == @permitted_domain
+              domain_permitted = true
+              break
+            end
+            
+          end
+          
+          if domain_permitted
+            
+            #Now let's check to see if its published or in draft mode.
+            if @post.status == "live"
+              render json: {:result => 'success', :message => "Access permitted.", :payload => {:post => @post.content}, :status => 200}
+            else
+              render json: {:result => 'failure', :reason => 'draft_mode', :message => "This content is in draft mode, please check back later for an update!", :payload => {}, :status => 200}
+            end  
+            
+          else
+            render json: {:result => 'failure', :reason => 'access_denied', :message => "To view this content here, please add #{params[:requesting_url]} to your permitted domains on", :payload => {}, :status => 200}
+          end  
+
+        else  
+          
+          render json: {:result => 'failure', :reason => 'not_found', :message => 'This post is no longer available.', :payload => {}, :status => 200}
        
+        end  
+         
+      else
+        
+        render json: {:result => 'failure', :message => 'Looks like you are missing your session token.', :payload => {}, :status => 200}
+        
+      end
+      
+    end 
+    
+    def v1_save_blog_and_post_content
+      
       if params[:blog_name].present? && params[:post_title].present? && params[:post_content].present? && params[:db_session_token].present?
         
         @user = User.where(:db_session_token => params[:db_session_token]).first
@@ -417,54 +471,6 @@ class BlogsController < ApplicationController
       end 
         
     end
-    
-    def v1_fetch_post_for_embed
-      
-      if params[:post_uid].present? && params[:requesting_url].present?
-        
-        #Let's get the post they requested to view.
-        @post = Post.where(:uid => params[:post_uid]).first
-        
-        if @post.present?
-          
-          #first, let's see what blog this post belongs to.
-          @blog = @post.blog
-          
-          #is the requesting url allowed to access this blog post?
-          domain_permitted = false
-          @blog.permitted_domains.each do |domain|
-            if (params[:requesting_url] == domain.permitted_domain || params[:requesting_url] == ("http://" + domain.permitted_domain) || params[:requesting_url] == ("https://" + domain.permitted_domain) || params[:requesting_url] == ("http://" + domain.permitted_domain + "/") || params[:requesting_url] == ("https://" + domain.permitted_domain + "/"))
-              domain_permitted = true
-              break
-            end  
-          end  
-          
-          if domain_permitted
-            
-            #Now let's check to see if its published or in draft mode.
-            if @post.status == "live"
-              render json: {:result => 'success', :message => "Access permitted.", :payload => {:post => @post.content}, :status => 200}
-            else
-              render json: {:result => 'failure', :reason => 'draft_mode', :message => "This content is in draft mode, please check back later for an update!", :payload => {}, :status => 200}
-            end  
-            
-          else
-            render json: {:result => 'failure', :reason => 'access_denied', :message => "To view this content here, please add #{params[:requesting_url]} to your permitted domains on", :payload => {}, :status => 200}
-          end  
-
-        else  
-          
-          render json: {:result => 'failure', :reason => 'not_found', :message => 'This post is no longer available.', :payload => {}, :status => 200}
-       
-        end  
-         
-      else
-        
-        render json: {:result => 'failure', :message => 'Looks like you are missing your session token.', :payload => {}, :status => 200}
-        
-      end
-      
-    end  
     
     def v1_add_permitted_domain
       
