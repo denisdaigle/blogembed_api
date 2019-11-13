@@ -433,7 +433,7 @@ class BlogsController < ApplicationController
           #is the requesting url allowed to access this blog post?
           domain_permitted = false
           @blog.permitted_domains.each do |domain|
-            if params[:requesting_url] == domain.permitted_domain
+            if (params[:requesting_url] == domain.permitted_domain || params[:requesting_url] == ("http://" + domain.permitted_domain) || params[:requesting_url] == ("https://" + domain.permitted_domain) || params[:requesting_url] == ("http://" + domain.permitted_domain + "/") || params[:requesting_url] == ("https://" + domain.permitted_domain + "/"))
               domain_permitted = true
               break
             end  
