@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_11_122701) do
+ActiveRecord::Schema.define(version: 2019_11_14_171801) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 2019_11_11_122701) do
     t.string "password_digest"
     t.string "password_reset_code"
     t.string "account_type", default: "trial"
+    t.string "stripe_customer_id"
   end
 
 end

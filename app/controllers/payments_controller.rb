@@ -13,30 +13,91 @@ class PaymentsController < ApplicationController
         # Set your secret key: remember to change this to your live secret key in production
         Stripe.api_key = Rails.application.secrets.stripe_secret_key
       
-        # This creates a new Customer
-        customer = Stripe::Customer.create(
-          email: @user.email
-        )
+        #Let's try creating a subscription with the card provided.
 
-        #Add the customer id to this user.
-        @user.update!(:stripe_customer_id => customer.id?)
+        begin
+          
+          # This creates a new Customer
+          customer = Stripe::Customer.create(
+            email: @user.email,
+            source: params[:stripeToken]
+          )
 
-        subscription = Stripe::Subscription.create(
-          customer: customer.id?,
-          items: [
-            {
-              plan: 'plan_GB6sbY5DJcghgu' #created plan in stripe dashboard.
-            }
-          ],
-          expand: ['latest_invoice.payment_intent']
-        )
+          Stripe::Subscription.create({
+            customer: customer["id"],
+            items: [
+              {
+                plan: 'plan_GB6sbY5DJcghgu', #from the stripe plan on the dashboard.
+              },
+            ],
+          })
+
+        rescue Stripe::CardError => e
         
+          @error = true
         
-        
-        #@user.update!(:account_type => "hero")
-        
-        render json: {:result => 'success', :message => 'Upgrade successful. Providing new account type', :payload => {:account_type => @user.account_type}, :status => 200}
-        
+          #Less handle what comes back from Stripe and inform the user if everything checks out.
+          @error_http_status = e.http_status
+          @error_type = e.error.type
+          if e.error.code
+            @error_code = e.error.code
+          end
+          if e.error.decline_code
+            @decline_code = e.error.decline_code
+          end  
+          if e.error.message
+            @error_mesage = e.error.message
+          end
+
+        rescue Stripe::RateLimitError => e
+          # Too many requests made to the API too quickly
+          @error = true
+        rescue Stripe::InvalidRequestError => e
+          # Invalid parameters were supplied to Stripe's API
+          @error = true
+        rescue Stripe::AuthenticationError => e
+          # Authentication with Stripe's API failed
+          # (maybe you changed API keys recently)
+          @error = true
+        rescue Stripe::APIConnectionError => e
+          # Network communication with Stripe failed
+          @error = true
+        rescue Stripe::StripeError => e
+          # Display a very generic error to the user, and maybe send
+          # yourself an email
+          @error = true
+        rescue => e
+          # Something else happened, completely unrelated to Stripe
+          @error = true
+        end
+
+        unless @error.present?
+          
+          #Add the customer id to this user.
+          @user.update!(:stripe_customer_id => customer["id"])
+          @user.update!(:account_type => "hero")
+          
+          render json: {:result => 'success', :message => 'Upgrade successful. Providing new account type', :payload => {:account_type => @user.account_type}, :status => 200}
+
+        else
+          
+          @reason = ""
+          if @error_type.present?
+            @reason = @error_type
+            if @decline_code.present?
+              @reason = @decline_code
+            end
+          end
+          
+          @error_mesage_to_send = ""
+          if @error_mesage.present?
+            @error_mesage_to_send = @error_mesage
+          end  
+          
+          render json: {:result => 'failure', :reason => @reason, :message => @error_mesage_to_send, :payload => {}, :status => 200}
+          
+        end  
+
       else
         
         render json: {:result => 'failure', :message => 'Hmm. Seems we could not find you in our database?', :payload => {}, :status => 200}
