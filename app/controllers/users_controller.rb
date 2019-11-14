@@ -214,7 +214,7 @@ class UsersController < ApplicationController
         
         if @user.present?
           
-          @user.update!(:account_type => "hero")
+          #@user.update!(:account_type => "hero")
           
           render json: {:result => 'success', :message => 'Upgrade successful. Providing new account type', :payload => {:account_type => @user.account_type}, :status => 200}
           
