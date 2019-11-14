@@ -9,6 +9,28 @@ class PaymentsController < ApplicationController
       if @user.present?
         
         #let's process this purchase using stripe now that we have the token.
+
+        # Set your secret key: remember to change this to your live secret key in production
+        Stripe.api_key = Rails.application.secrets.stripe_secret_key
+      
+        # This creates a new Customer
+        customer = Stripe::Customer.create(
+          email: @user.email
+        )
+
+        #Add the customer id to this user.
+        @user.update!(:stripe_customer_id => customer.id?)
+
+        subscription = Stripe::Subscription.create(
+          customer: customer.id?,
+          items: [
+            {
+              plan: 'plan_GB6sbY5DJcghgu' #created plan in stripe dashboard.
+            }
+          ],
+          expand: ['latest_invoice.payment_intent']
+        )
+        
         
         
         #@user.update!(:account_type => "hero")

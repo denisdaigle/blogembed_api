@@ -206,32 +206,6 @@ class UsersController < ApplicationController
       
     end  
     
-    def v1_process_upgrade
-
-      if params[:db_session_token].present?
-        
-        @user = User.find_by_db_session_token(params[:db_session_token])
-        
-        if @user.present?
-          
-          #@user.update!(:account_type => "hero")
-          
-          render json: {:result => 'success', :message => 'Upgrade successful. Providing new account type', :payload => {:account_type => @user.account_type}, :status => 200}
-          
-        else
-          
-          render json: {:result => 'failure', :message => 'Hmm. Seems we could not find you in our database?', :payload => {}, :status => 200}
-          
-        end  
-        
-      else
-        
-        render json: {:result => 'failure', :message => 'Uh-oh, seems you are missing db_session_token is missing', :payload => {}, :status => 200}
-        
-      end
-      
-    end  
-    
     def v1_send_for_help
       
       #create a user account. (no error checking yet: valid email, already existing user)
