@@ -27,7 +27,7 @@ class PaymentsController < ApplicationController
             customer: customer["id"],
             items: [
               {
-                plan: 'plan_GB6sbY5DJcghgu', #from the stripe plan on the dashboard.
+                plan: 'plan_GBDv9iWwnPhhk2', #from the stripe plan on the dashboard.
               },
             ],
           })
@@ -76,6 +76,14 @@ class PaymentsController < ApplicationController
           #Add the customer id to this user.
           @user.update!(:stripe_customer_id => customer["id"])
           @user.update!(:account_type => "hero")
+          
+          #Email our Hero!
+          @recipient_name = @user.first_name
+          @recipient_email = @user.email
+          @subject = "Thanks for becoming a BlogEmbed.com Hero!"
+          @body = "Thank you for purchasing the BlogEmbed.com Hero plan. Truly, this means a lot to our team and keeps us working hard!"
+          GeneralMailer.hero_email(@recipient_name, @recipient_email, @subject, @body).deliver
+
           
           render json: {:result => 'success', :message => 'Upgrade successful. Providing new account type', :payload => {:account_type => @user.account_type}, :status => 200}
 

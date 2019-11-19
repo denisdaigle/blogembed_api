@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
   
-  get 'payments/process_upgrade'
   #utilities
   get '/v1/api_check' => 'application#v1_api_check' #For clients to verify api access
   
@@ -10,7 +9,7 @@ Rails.application.routes.draw do
   post '/v1/save_profile_setup' => "users#v1_save_profile_setup"
   get '/v1/check_account_type' => "users#v1_check_account_type"
   post '/v1/send_for_help' => "users#v1_send_for_help" 
-  
+
   #process_payments
   post '/v1/process_upgrade' => "payments#v1_process_upgrade"
   

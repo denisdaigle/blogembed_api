@@ -19,4 +19,12 @@ class GeneralMailer < ApplicationMailer
     mail(to: "#{@recipient_name} <#{@recipient_email}>", from: "BlogEmbed.com Help Team <help@blogembed.com>", subject: @subject)
   end
   
+  def hero_email(recipient_name, recipient_email, subject, body)
+    @recipient_name = recipient_name
+    @recipient_email = recipient_email
+    @subject = subject
+    @body = body
+    mail(to: "#{@recipient_name} <#{@recipient_email}>", from: "Denis Daigle - Creator of BlogEmbed <denis@blogembed.com>", subject: @subject)
+  end
+  
 end

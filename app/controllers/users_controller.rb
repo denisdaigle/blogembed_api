@@ -253,5 +253,5 @@ class UsersController < ApplicationController
       render json: {:result => 'success', :message => 'Alright, message sent.', :payload => {}, :status => 200}  
 
     end  
-
+    
 end
