@@ -1,2 +1,5 @@
 development:
     webserver_domain: "http://35.175.140.221:8080"
+
+production:
+    webserver_domain: "http://blogembed.com"    
