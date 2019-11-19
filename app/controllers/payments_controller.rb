@@ -27,11 +27,19 @@ class PaymentsController < ApplicationController
             source: params[:stripeToken]
           )
 
+          if Rails.env == "production"
+            #production plan
+            @plan = "plan_GCwQslNL3X5YBr"
+          else
+            #test plan
+            @plan = "plan_GBDv9iWwnPhhk2"
+          end  
+
           Stripe::Subscription.create({
             customer: customer["id"],
             items: [
               {
-                plan: 'plan_GBDv9iWwnPhhk2', #from the stripe plan on the dashboard.
+                plan: @plan, #from the stripe plan on the dashboard.
               },
             ],
           })
