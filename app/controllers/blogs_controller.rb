@@ -20,12 +20,25 @@ class BlogsController < ApplicationController
             @permitted_domain = domain.permitted_domain.gsub("https://", "").gsub("http://", "").gsub!("/", "")
             @requesting_url = params[:requesting_url]
 
+            puts "domain.permitted_domain: #{domain.permitted_domain}"
+            puts "@requesting_url: #{@requesting_url}"
+            puts "@permitted_domain: #{@permitted_domain}"
+            puts "domain_permitted: #{@requesting_url == @permitted_domain}"
+
             if @requesting_url == @permitted_domain
+              #Found it, don;t need to search other domains.
               domain_permitted = true
               break
             end
             
+            #if we've found one, we don't need to search other blogs.
+            if domain_permitted
+              break
+            end  
+            
           end
+          
+          puts "domain_permitted: #{domain_permitted}"
           
           if domain_permitted
             
