@@ -11,8 +11,12 @@ class PaymentsController < ApplicationController
         #let's process this purchase using stripe now that we have the token.
 
         # Set your secret key: remember to change this to your live secret key in production
-        Stripe.api_key = Rails.application.secrets.stripe_secret_key
-      
+        if Rails.env == "production"
+          Stripe.api_key = ENV['STRIPE_SECRET_KEY']
+        else  
+          Stripe.api_key = Rails.application.secrets.stripe_secret_key
+        end
+        
         #Let's try creating a subscription with the card provided.
 
         begin
