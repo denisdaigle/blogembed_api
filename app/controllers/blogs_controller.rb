@@ -17,9 +17,9 @@ class BlogsController < ApplicationController
           @blog.permitted_domains.each do |domain|
             
             #Let's remopve the extra stuff people paste into the domain field, to leave the pure domain.
-            @permitted_domain = domain.permitted_domain.gsub!("https://", "")
-            @permitted_domain = @permitted_domain.gsub!("https://", "")
-            @permitted_domain = @permitted_domain.gsub!("/", "")
+            @permitted_domain = domain.permitted_domain.gsub("https://", "")
+            @permitted_domain = @permitted_domain.gsub("https://", "")
+            @permitted_domain = @permitted_domain.gsub("/", "")
             
             @requesting_url = params[:requesting_url]
 
