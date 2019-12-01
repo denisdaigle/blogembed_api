@@ -228,10 +228,10 @@ class BlogsController < ApplicationController
           @post = @user.posts.where(:uid => params[:post_uid]).first
           
           if @post.present?
-            
+
             #save post changes.
             @post.update!(:title => params[:post_title], :content => params[:post_content])
-            
+
             render json: {:result => 'success', :message => "Here is your post information.", :payload => {:post => @post.get_post_details}, :status => 200}
           else  
             render json: {:result => 'failure', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
@@ -250,6 +250,66 @@ class BlogsController < ApplicationController
       end 
         
     end 
+    
+    
+    def v1_save_partial_post_content_update
+      
+      if params[:partial_index].present? && params[:partial_content].present? && params[:post_uid].present? && params[:db_session_token].present?
+        
+        @user = User.where(:db_session_token => params[:db_session_token]).first
+  
+        if @user.present?
+
+          #Let's get the post they requested to view.
+          @post_to_update = @user.posts.where(:uid => params[:post_uid]).first
+   
+          if @post_to_update.present?
+    
+            @partial_post_record = Partialupdate.where(:post_id => @post_to_update.id).first
+            
+            unless @partial_post_record.present?
+              @partial_post_record = Partialupdate.create!(:post_id => @post_to_update.id, :final_partial_index => params[:total_partials_to_expect], :partial_content => "")
+            end
+
+            #update.
+            @partial_post_record.update!(:partial_content => @partial_post_record.partial_content + params[:partial_content], :lastest_partial_index => params[:partial_index])
+  
+            #Let's check if the final partial index was obtained. If so, update the actual post.
+            if @partial_post_record.lastest_partial_index == @partial_post_record.final_partial_index
+
+              #save post changes.
+              @post_to_update.update!(:title => params[:post_title], :content => @partial_post_record.partial_content)
+              
+              #let's delete the partial post content record.
+              @partial_post_record.destroy
+              
+              render json: {:result => 'success', :message => "Here is your post information.", :payload => {:post => @post_to_update.get_post_details}, :status => 200}
+
+            else
+      
+              render json: {:result => 'success', :message => "PArtial content saved. Waiting for next partial.", :payload => {}, :status => 200}
+
+            end  
+  
+          else  
+            render json: {:result => 'failure', :message => 'Sorry, we could not find this post in our database.', :payload => {}, :status => 200}
+          end
+
+        else
+          
+          render json: {:result => 'failure', :message => 'Sorry, we could not find your user account', :payload => {}, :status => 200}
+        
+        end  
+         
+      else
+        
+        render json: {:result => 'failure', :message => 'Looks like you are missing some details', :payload => {}, :status => 200}
+        
+      end
+      
+    end  
+    
+    
     
     def v1_create_post
       

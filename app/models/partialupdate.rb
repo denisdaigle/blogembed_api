@@ -1,0 +1,2 @@
+class Partialupdate < ApplicationRecord
+end

@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  post_id: 1
+  total_partials_expected: 1
+  lastest_partial_index: 1
+  partial_content: MyText
+
+two:
+  post_id: 1
+  total_partials_expected: 1
+  lastest_partial_index: 1
+  partial_content: MyText

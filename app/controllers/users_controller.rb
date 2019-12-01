@@ -127,7 +127,7 @@ class UsersController < ApplicationController
     end  
     
     def v1_process_login
-      
+
       @user = User.where(:email => params[:email]).first
       if @user.present?
         if @user.authenticate(params[:password])

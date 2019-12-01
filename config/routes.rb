@@ -39,5 +39,6 @@ Rails.application.routes.draw do
   get '/v1/fetch_blog_details' => 'blogs#v1_fetch_blog_details'
   get '/v1/remove_permitted_domain' => 'blogs#v1_remove_permitted_domain'
 
+  post '/v1/save_partial_post_content_update' => 'blogs#v1_save_partial_post_content_update'
   
 end
